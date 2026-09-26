@@ -1,0 +1,20 @@
+[package]
+name = "authorization-service"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+argon2 = "0.6.0"
+axum = "0.8.9"
+axum-server = "0.8.0"
+axum-swagger-ui = "0.3.0"
+chrono = "0.4.45"
+dotenv = "0.15.0"
+jsonwebtoken = "11.1.0"
+ring = "0.17.14"
+serde = { version = "1.0.229" }
+sqlx = { version = "0.9.0", features = ["sqlite", "runtime-tokio-rustls"] }
+tokio = { version = "1.53.1", features = ["full"] }
+utoipa = "6.0.0"
+utoipa-swagger-ui = { version = "10.0.1", features = ["axum"] }
+uuid = { version = "1.26.1", features = ["v4"] }
