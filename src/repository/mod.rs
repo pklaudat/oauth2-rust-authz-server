@@ -1,5 +1,6 @@
 use sqlx::SqlitePool;
 
+pub mod client;
 
 pub struct DatabaseConnection {
     pub pool: SqlitePool,

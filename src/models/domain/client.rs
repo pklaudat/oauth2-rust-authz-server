@@ -23,3 +23,14 @@ pub enum GrantType {
     ClientCredentials,
     RefreshToken,
 }
+
+#[derive(Debug, Deserialize)]
+pub struct ClientDetails {
+    pub id: String,
+    pub client_id: String,
+    pub grant_types: Vec<GrantType>,
+    pub redirect_uris: Vec<String>,
+    pub scopes: Vec<String>,
+    #[serde(skip_deserializing)]
+    pub created_at: DateTime<Utc>,
+}
