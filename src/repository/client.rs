@@ -1,15 +1,14 @@
 
 use uuid::Uuid;
-
-use crate::{models::requests::register_client::{RegisterClientRequest, RegisterClientResponse}, repository::DatabaseConnection};
+use crate::models::requests::register_client::{RegisterClientRequest, RegisterClientResponse};
 
 pub struct ClientRepository {
-    pub db_connection: DatabaseConnection,
+    pub db_pool: sqlx::SqlitePool,
 }
 
 impl ClientRepository {
-    pub async fn new(db_connection: DatabaseConnection) -> Result<Self, sqlx::Error> {
-        Ok(Self { db_connection })
+    pub async fn new(db_pool: sqlx::SqlitePool) -> Result<Self, sqlx::Error> {
+        Ok(Self { db_pool })
     }
 
     pub async fn register_application(&self, request: RegisterClientRequest) -> Result<RegisterClientResponse, sqlx::Error> {
@@ -28,7 +27,7 @@ impl ClientRepository {
 
         let created_at = chrono::Utc::now();
 
-        sqlx::query(
+        sqlx::query!(
             r#"
             INSERT INTO clients (
                 id,
@@ -40,19 +39,18 @@ impl ClientRepository {
                 scopes,
                 created_at
             )
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-            "#
+            VALUES (?,?,?,?,?,?,?,?)
+            "#,
+                id.to_string(),
+                client_id,
+                client_secret,
+                request.name,
+                redirect_uris,
+                scopes,
+                created_at.to_rfc3339()
         )
-        .bind(id.to_string())
-        .bind(client_id)
-        .bind(client_secret)
-        .bind("")
-        .bind(request.name)
-        .bind(redirect_uris)
-        .bind(scopes)
-        .bind(created_at.to_rfc3339())
-        .execute(&self.db_connection.pool)
-        .await?;
+            .execute(&self.db_connection)
+            .await?;
 
         
         Ok(RegisterClientResponse {

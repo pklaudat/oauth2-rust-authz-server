@@ -16,3 +16,10 @@ pub struct RegisterClientResponse {
     pub client_id: String,
     pub client_secret: Option<String>,
 }
+
+pub struct UpdateClientRequest {
+    pub name: String,
+    pub redirect_uris: Vec<String>,
+    pub grant_types: Vec<GrantType>,
+    pub scopes: Vec<String>
+}

@@ -5,9 +5,12 @@ use dotenv::dotenv;
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
+use crate::repository::DatabaseConnection;
+
 mod models;
 mod service;
 mod repository;
+mod routes;
 
 #[derive(OpenApi)]
 #[openapi(paths(
@@ -35,6 +38,10 @@ async fn main() {
         Ok(val) => println!("Database is set: {}", val),
         Err(e) => println!("Error reading database configuration {}", e),
     }
+
+    let db_url = env::var("DATABASE_URL").unwrap();
+
+    let database = sqlx::SqlitePool::connect(&db_url).await.unwrap();
 
     let app = Router::new()
         .route("/health", get(health))

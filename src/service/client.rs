@@ -1,8 +1,4 @@
 
-use std::error::Error;
-
-use axum::Error;
-use uuid::Uuid;
 use crate::models::requests::register_client::{RegisterClientRequest, RegisterClientResponse};
 use crate::models::errors::ClientServiceError;
 use crate::repository::DatabaseConnection;
