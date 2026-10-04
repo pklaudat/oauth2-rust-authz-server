@@ -1,5 +1,7 @@
 use std::net::SocketAddr;
 use axum::{Router, routing::get};
+use azure_data_tables::clients::TableServiceClient;
+use azure_storage::StorageCredentials;
 use std::env;
 use dotenv::dotenv;
 use utoipa::OpenApi;
@@ -30,18 +32,29 @@ async fn health() -> &'static str {
     "health"
 }
 
+struct StorageProperties {
+    name: String,
+    key: String,
+    table_name: String
+}
+
 #[tokio::main]
 async fn main() {
     dotenv().ok();
 
-    match env::var("DATABASE_URL") {
-        Ok(val) => println!("Database is set: {}", val),
-        Err(e) => println!("Error reading database configuration {}", e),
-    }
+    let storage = StorageProperties{
+        name: env::var("STORAGE_ACCOUNT_NAME").expect("Set the storage account name!."),
+        key: env::var("STORAGE_ACCOUNT_KEY").expect("Set the storage account key for authentication!."),
+        table_name: env::var("TABLE_NAME").expect("Set the table name for the oauth2 apps.")
+    };
 
-    let db_url = env::var("DATABASE_URL").unwrap();
+    let storage_credentials = StorageCredentials::access_key(storage.name.clone(), storage.key);
 
-    let database = sqlx::SqlitePool::connect(&db_url).await.unwrap();
+    let table_service = TableServiceClient::new(storage.name, storage_credentials);
+
+    let table_client = table_service.table_client(storage.table_name);
+
+    table_client.create().await?;
 
     let app = Router::new()
         .route("/health", get(health))
