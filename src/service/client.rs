@@ -1,18 +1,17 @@
 
 use crate::models::requests::register_client::{RegisterClientRequest, RegisterClientResponse};
 use crate::models::errors::ClientServiceError;
-use crate::repository::DatabaseConnection;
-use crate::repository::client::{ClientRepository};
+use crate::repository::Oauth2;
+use crate::repository::client::{Oauth2ClientRepository};
 
-pub struct ClientService {
-    pub client_repository: ClientRepository,
+pub struct Oauth2ClientService {
+    pub client_repository: Oauth2ClientRepository,
 }
 
 
-impl ClientService {
+impl Oauth2ClientService {
 
-    pub async fn new(db_connection: DatabaseConnection) -> Result<Self, sqlx::Error> {
-        let client_repository = ClientRepository::new(db_connection).await?;
+    pub async fn new(client_repository: Oauth2ClientRepository) -> Result<Self, ClientServiceError> {
         Ok(Self { client_repository })
     }
 

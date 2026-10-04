@@ -2,12 +2,12 @@
 use azure_data_tables::clients::TableClient;
 use azure_storage::Error;
 use uuid::Uuid;
-use crate::models::{domain::client::{Client, Oauth2Client}, requests::register_client::{RegisterClientRequest, RegisterClientResponse}};
-pub struct ClientRepository {
+use crate::models::{domain::client::{Oauth2Client}, requests::register_client::{RegisterClientRequest, RegisterClientResponse}};
+pub struct Oauth2ClientRepository {
     pub db_pool: TableClient<>,
 }
 
-impl ClientRepository {
+impl Oauth2ClientRepository {
     pub async fn new(db_pool: TableClient ) -> Result<Self, Error> {
         Ok(Self { db_pool })
     }

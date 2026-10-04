@@ -7,7 +7,7 @@ use dotenv::dotenv;
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
-use crate::repository::DatabaseConnection;
+use crate::{repository::{DatabaseConnection, client::Oauth2ClientRepository}, service::client::Oauth2ClientService};
 
 mod models;
 mod service;
@@ -32,17 +32,21 @@ async fn health() -> &'static str {
     "health"
 }
 
-struct StorageProperties {
+struct StorageConnectionProperties {
     name: String,
     key: String,
     table_name: String
+}
+
+struct AppState {
+    oauth2_repository: Oauth2ClientRepository,
 }
 
 #[tokio::main]
 async fn main() {
     dotenv().ok();
 
-    let storage = StorageProperties{
+    let storage = StorageConnectionProperties{
         name: env::var("STORAGE_ACCOUNT_NAME").expect("Set the storage account name!."),
         key: env::var("STORAGE_ACCOUNT_KEY").expect("Set the storage account key for authentication!."),
         table_name: env::var("TABLE_NAME").expect("Set the table name for the oauth2 apps.")
@@ -55,6 +59,10 @@ async fn main() {
     let table_client = table_service.table_client(storage.table_name);
 
     table_client.create().await?;
+
+    let repository = Oauth2ClientRepository::new(table_client).await?;
+
+    let service: Oauth2ClientService::new(repository);
 
     let app = Router::new()
         .route("/health", get(health))

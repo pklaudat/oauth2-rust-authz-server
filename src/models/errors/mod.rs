@@ -1,6 +1,6 @@
 
 #[derive(Debug, Error)]
-pub enum ClientServiceError {
+pub enum Oauth2ClientServiceError {
     #[error("client name cannot be empty")]
     InvalidName,
     #[error("missing redirect uri")]
